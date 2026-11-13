@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from streamlit_calendar import calendar
 
-from dentalflow.db import AppointmentEvent, Patient, Professional, Service, initialize, session_factory
+from dentalflow.db import Appointment, AppointmentEvent, Patient, Professional, Service, initialize, session_factory
 from dentalflow.security import config, database_url, is_demo, verify_credentials
 from dentalflow.services import (
     BusinessError, STATUSES, add_block, change_status, create_appointment, create_patient,
@@ -76,7 +76,22 @@ def login():
 
 
 if not DB_URL:
-    st.error("**Falta configurar la base de datos.** Define DATABASE_URL en los secretos de Streamlit. Para explorar sin datos reales configura DEMO_MODE = 'true'.")
+    st.title("🦷 DentalFlow · Configuración inicial")
+    st.info("La aplicación está publicada correctamente, pero aún no tiene una base de datos configurada. Para continuar, abre Streamlit Community Cloud → tu aplicación → Settings → Secrets.")
+    left, right = st.columns(2, gap="large")
+    with left:
+        with st.container(border=True):
+            st.subheader("🧪 Explorar la demostración")
+            st.write("Para probar el diseño y la agenda con información ficticia, agrega estos secretos y guarda los cambios:")
+            st.code('DEMO_MODE = "true"\nCLINIC_NAME = "DentalFlow Demo"', language="toml")
+            st.warning("Modo demo sin inicio de sesión y con datos temporales. Nunca registres pacientes reales aquí.")
+    with right:
+        with st.container(border=True):
+            st.subheader("🔒 Configurar uso real")
+            st.write("Para guardar citas y pacientes de manera persistente, configura PostgreSQL y las credenciales administrativas:")
+            st.code('DEMO_MODE = "false"\nAPP_ENV = "production"\nDATABASE_URL = "postgresql://USUARIO:CLAVE@HOST:5432/BASE?sslmode=require"\nADMIN_EMAIL = "admin@tuclinica.com"\nADMIN_PASSWORD_HASH = "HASH_SCRYPT_GENERADO"', language="toml")
+            st.caption("La contraseña se transforma a hash con `python scripts/hash_password.py`. Usa la URL real de tu proveedor PostgreSQL, nunca los valores de ejemplo.")
+    st.markdown("**Dónde editar los secretos:** [Guía oficial de Streamlit](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app/app-settings#view-or-update-your-secrets)")
     st.stop()
 if not DEMO and DB_URL.startswith("sqlite") and config("APP_ENV", "production").lower() == "production":
     st.error("**Producción requiere PostgreSQL.** SQLite no garantiza persistencia en hospedajes efímeros; configura DATABASE_URL con PostgreSQL.")
