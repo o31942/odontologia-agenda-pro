@@ -1,0 +1,16 @@
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.log
+*.csv
+.DS_Store
